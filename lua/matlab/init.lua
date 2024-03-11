@@ -1,11 +1,17 @@
 M = {}
+local _defaults = {
+    matlab_dir = "/usr/local/MATLAB/R2023b/bin/matlab"
+}
 
-M.test = function()
-    print("Test Successful")
+local _config = {}
+
+M.setup = function (user_opts)
+     -- Merge user configuration with defaults
+    _config = vim.tbl_deep_extend("keep", user_opts or {}, _defaults)
+    return _config
 end
 
-
-M.open_buffer = function()
+M._MatlabOpenBuffer = function()
     -- Get the current buffer number
     local current_buffer = vim.fn.bufnr('%')
 
@@ -16,18 +22,18 @@ M.open_buffer = function()
     vim.cmd('vertical resize 50')
 
     -- Get the buffer number of the newly opened buffer
-    local new_buffer = vim.fn.bufnr('%')
+    M._cli_buff = vim.fn.bufnr('%')
 
-    return new_buffer
+    return M._cli_buff
 end
 
-M.open_matlab_window = function()
-    local matlab_dir = "/usr/local/MATLAB/R2023b/bin/matlab"
+M.MatlabCliOpen = function()
+    local matlab_dir = _config.matlab_dir
     -- Define the command to execute MATLAB with the script
-    local command = matlab_dir .. " -nodisplay -nosplash -nodesktop"
+    local command = matlab_dir .. " -nosplash -nodesktop"
     -- local command = "ls"
 
-    local mat_buffer = M.open_buffer()
+    local mat_buffer = M._MatlabOpenBuffer()
 
     -- Execute commands in the terminal
     local job_id = vim.fn.termopen(command)
@@ -38,17 +44,17 @@ M.open_matlab_window = function()
     M._job_id = job_id
 end
 
-M.send_commands = function(command)
+M.MatlabCliRunCommand = function(command)
     vim.api.nvim_chan_send(M._job_id, command)
 end
 
-M.send_line_under_cursor = function()
+M.MatlabCliRunLine = function()
     local line_content = vim.api.nvim_get_current_line()
     -- Print the captured line
-    M.send_commands(line_content .. "\n")
+    M.MatlabCliRunCommand(line_content .. "\n")
 end
 
-M.send_visual_selection_lines = function()
+M.MatlabCliRunSelection = function()
     local vstart = vim.fn.getpos("'<")
 
     local vend = vim.fn.getpos("'>")
@@ -60,13 +66,13 @@ M.send_visual_selection_lines = function()
     local lines = vim.api.nvim_buf_get_lines(0, line_start - 1, line_end, false)
 
     for _, line in ipairs(lines) do
-        M.send_commands(line .. "\n")
+        M.MatlabCliRunCommand(line .. "\n")
     end
     return lines
 end
 
 
-M.send_block = function()
+M.MatlabCliRunCell = function()
     local cursor = vim.api.nvim_win_get_cursor(0)
     local line_number = cursor[1]
 
@@ -97,15 +103,33 @@ M.send_block = function()
     else
         bellow_line = line_count
     end
-    lines = vim.api.nvim_buf_get_lines(0, above_line - 1, bellow_line, false)
+    local lines = vim.api.nvim_buf_get_lines(0, above_line - 1, bellow_line, false)
 
     for _, line in ipairs(lines) do
-        M.send_commands(line .. "\n")
+        M.MatlabCliRunCommand(line .. "\n")
     end
 
     return lines
 end
 
-local job_id = M.open_matlab_window()
+M.MatlabOpenWorkspace = function ()
+    M.MatlabCliRunCommand("workspace;\n")
+end
+
+M.MatlabOpenEditor = function ()
+    M.MatlabCliRunCommand("edit;\n")
+end
+
+M.MatlabCliClear = function ()
+    M.MatlabCliRunCommand("clear;\n")
+end
+
+-- Function to check if the terminal buffer is closed
+M.MatlabCliRunning = function()
+    return vim.api.nvim_buf_is_valid(M._cli_buff)
+end
+
+M.setup()
+-- local job_id = M.MatlabCliOpen()
 
 return M
