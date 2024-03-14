@@ -81,7 +81,7 @@ M.MatlabCliRunCell = function()
 
     for i = line_number, 1, -1 do
         local local_line = vim.api.nvim_buf_get_lines(0, i - 1, i, false)[1]
-        if local_line:find("^%%{2}") then
+        if local_line:find("^%%%%") then
             above_line = i
             break
         elseif i == 1 then
@@ -93,7 +93,7 @@ M.MatlabCliRunCell = function()
     if line_number ~= line_count then
         for i = line_number + 1, line_count do
             local local_line = vim.api.nvim_buf_get_lines(0, i - 1, i, false)[1]
-            if local_line:find("^%%") then
+            if local_line:find("^%%%%") then
                 bellow_line = i
                 break
             elseif i == line_count then
