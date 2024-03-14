@@ -12,18 +12,19 @@ M.setup = function(user_opts)
 
     -- Create User Commands
 
-    vim.api.nvim_create_user_command("MatlabCliOpen", M.MatlabCliOpen, {})
-    vim.api.nvim_create_user_command("MatlabCliRunLine", M.MatlabCliRunLine, {})
-    vim.api.nvim_create_user_command("MatlabCliRunSelection", M.MatlabCliRunSelection, {})
-    vim.api.nvim_create_user_command("MatlabCliRunCell", M.MatlabCliRunCell, {})
-    vim.api.nvim_create_user_command("MatlabOpenWorkspace", M.MatlabOpenWorkspace, {})
-    vim.api.nvim_create_user_command("MatlabOpenEditor", M.MatlabOpenEditor, {})
-    vim.api.nvim_create_user_command("MatlabCliClear", M.MatlabCliClear, {})
+    vim.api.nvim_create_user_command("MatlabCliOpen", M.matlab_cli_open, {})
+    vim.api.nvim_create_user_command("MatlabCliRunLine", M.matlab_cli_run_line, {})
+    vim.api.nvim_create_user_command("MatlabCliRunSelection", M.matlab_cli_run_selection, {})
+    vim.api.nvim_create_user_command("MatlabCliRunCell", M.matlab_cli_run_cell, {})
+    vim.api.nvim_create_user_command("MatlabOpenWorkspace", M.matlab_open_workspace, {})
+    vim.api.nvim_create_user_command("MatlabOpenEditor", M.matlab_open_editor, {})
+    vim.api.nvim_create_user_command("MatlabCliClear", M.matlab_cli_clear, {})
+    vim.api.nvim_create_user_command("MatlabCliCancelOperation", M.matlab_cli_cancel_operation, {})
 
     return _config
 end
 
-M._MatlabOpenBuffer = function()
+M._matlab_open_buffer = function()
     -- Get the current buffer number
     local current_buffer = vim.fn.bufnr('%')
 
@@ -39,13 +40,13 @@ M._MatlabOpenBuffer = function()
     return M._cli_buff
 end
 
-M.MatlabCliOpen = function()
+M.matlab_cli_open = function()
     local matlab_dir = _config.matlab_dir
     -- Define the command to execute MATLAB with the script
     local command = matlab_dir .. " -nosplash -nodesktop"
     -- local command = "ls"
 
-    local mat_buffer = M._MatlabOpenBuffer()
+    local mat_buffer = M._matlab_open_buffer()
 
     -- Execute commands in the terminal
     local job_id = vim.fn.termopen(command)
@@ -56,17 +57,17 @@ M.MatlabCliOpen = function()
     M._job_id = job_id
 end
 
-M.MatlabCliRunCommand = function(command)
+M.matlab_cli_run_command = function(command)
     vim.api.nvim_chan_send(M._job_id, command)
 end
 
-M.MatlabCliRunLine = function()
+M.matlab_cli_run_line = function()
     local line_content = vim.api.nvim_get_current_line()
     -- Print the captured line
-    M.MatlabCliRunCommand(line_content .. "\n")
+    M.matlab_cli_run_command(line_content .. "\n")
 end
 
-M.MatlabCliRunSelection = function()
+M.matlab_cli_run_selection = function()
     local vstart = vim.fn.getpos("'<")
 
     local vend = vim.fn.getpos("'>")
@@ -78,13 +79,13 @@ M.MatlabCliRunSelection = function()
     local lines = vim.api.nvim_buf_get_lines(0, line_start - 1, line_end, false)
 
     for _, line in ipairs(lines) do
-        M.MatlabCliRunCommand(line .. "\n")
+        M.matlab_cli_run_command(line .. "\n")
     end
     return lines
 end
 
 
-M.MatlabCliRunCell = function()
+M.matlab_cli_run_cell = function()
     local cursor = vim.api.nvim_win_get_cursor(0)
     local line_number = cursor[1]
 
@@ -118,32 +119,37 @@ M.MatlabCliRunCell = function()
     local lines = vim.api.nvim_buf_get_lines(0, above_line - 1, bellow_line, false)
 
     for _, line in ipairs(lines) do
-        M.MatlabCliRunCommand(line .. "\n")
+        M.matlab_cli_run_command(line .. "\n")
     end
 
     return lines
 end
 
-M.MatlabOpenWorkspace = function()
-    M.MatlabCliRunCommand("workspace;\n")
+M.matlab_open_workspace = function()
+    M.matlab_cli_run_command("workspace;\n")
 end
 
-M.MatlabOpenEditor = function()
+M.matlab_open_editor = function()
     -- Get the current buffer number
     local current_buffer = vim.fn.bufnr('%')
     local buffer_location = vim.api.nvim_buf_get_name(current_buffer)
 
 
-    M.MatlabCliRunCommand("edit('" .. buffer_location .. "');\n")
+    M.matlab_cli_run_command("edit('" .. buffer_location .. "');\n")
 end
 
-M.MatlabCliClear = function()
-    M.MatlabCliRunCommand("clear;\n")
+M.matlab_cli_clear = function()
+    M.matlab_cli_run_command("clear;\n")
 end
 
 -- Function to check if the terminal buffer is closed
-M._MatlabClnRunning = function()
+M._matlab_cli_running = function()
     return vim.api.nvim_buf_is_valid(M._cli_buff)
+end
+
+
+M.matlab_cli_cancel_operation = function()
+    M.matlab_cli_run_command('\x03')
 end
 
 
