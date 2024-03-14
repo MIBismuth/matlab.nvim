@@ -5,9 +5,21 @@ local _defaults = {
 
 local _config = {}
 
-M.setup = function (user_opts)
-     -- Merge user configuration with defaults
+M.setup = function(user_opts)
+    -- Merge user configuration with defaults
     _config = vim.tbl_deep_extend("keep", user_opts or {}, _defaults)
+
+
+    -- Create User Commands
+
+    vim.api.nvim_create_user_command("MatlabCliOpen", M.MatlabCliOpen,{})
+    vim.api.nvim_create_user_command("MatlabCliRunLine", M.MatlabCliRunLine,{})
+    vim.api.nvim_create_user_command("MatlabCliRunSelection", M.MatlabCliRunSelection,{})
+    vim.api.nvim_create_user_command("MatlabCliRunCell", M.MatlabCliRunCell,{})
+    vim.api.nvim_create_user_command("MatlabOpenWorkspace", M.MatlabOpenWorkspace,{})
+    vim.api.nvim_create_user_command("MatlabOpenEditor", M.MatlabOpenEditor,{})
+    vim.api.nvim_create_user_command("MatlabCliClear", M.MatlabCliClear,{})
+
     return _config
 end
 
@@ -112,24 +124,22 @@ M.MatlabCliRunCell = function()
     return lines
 end
 
-M.MatlabOpenWorkspace = function ()
+M.MatlabOpenWorkspace = function()
     M.MatlabCliRunCommand("workspace;\n")
 end
 
-M.MatlabOpenEditor = function ()
+M.MatlabOpenEditor = function()
     M.MatlabCliRunCommand("edit;\n")
 end
 
-M.MatlabCliClear = function ()
+M.MatlabCliClear = function()
     M.MatlabCliRunCommand("clear;\n")
 end
 
 -- Function to check if the terminal buffer is closed
-M.MatlabCliRunning = function()
+M._MatlabClnRunning = function()
     return vim.api.nvim_buf_is_valid(M._cli_buff)
 end
 
-M.setup()
--- local job_id = M.MatlabCliOpen()
 
 return M
