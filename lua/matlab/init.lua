@@ -20,6 +20,9 @@ M.setup = function(user_opts)
     vim.api.nvim_create_user_command("MatlabOpenEditor", M.matlab_open_editor, {})
     vim.api.nvim_create_user_command("MatlabCliClear", M.matlab_cli_clear, {})
     vim.api.nvim_create_user_command("MatlabCliCancelOperation", M.matlab_cli_cancel_operation, {})
+    vim.api.nvim_create_user_command("MatlabCliToggle", M.matlab_cli_toggle, {})
+    vim.api.nvim_create_user_command("MatlabHelp", M.matlab_help, {})
+    vim.api.nvim_create_user_command("MatlabDoc", M.matlab_doc, {})
 
     return _config
 end
@@ -36,6 +39,9 @@ M._matlab_open_buffer = function()
 
     -- Get the buffer number of the newly opened buffer
     M._cli_buff = vim.fn.bufnr('%')
+
+    -- Get the window handle
+    M._cli_win_handle = vim.api.nvim_get_current_win()
 
     return M._cli_buff
 end
@@ -150,6 +156,20 @@ end
 
 M.matlab_cli_cancel_operation = function()
     M.matlab_cli_run_command('\x03')
+end
+
+M.matlab_help = function()
+    local cursorword = vim.fn.escape(vim.fn.expand('<cword>'), [[\/]])
+    M.matlab_cli_run_command("help " .. cursorword .. "\n")
+end
+
+M.matlab_doc = function()
+    local cursorword = vim.fn.escape(vim.fn.expand('<cword>'), [[\/]])
+    M.matlab_cli_run_command("doc " .. cursorword .. "\n")
+end
+
+M.matlab_cli_toggle = function ()
+    vim.api.nvim_win_hide(M._cli_win_handle)
 end
 
 
