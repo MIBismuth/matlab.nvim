@@ -12,13 +12,13 @@ M.setup = function(user_opts)
 
     -- Create User Commands
 
-    vim.api.nvim_create_user_command("MatlabCliOpen", M.MatlabCliOpen,{})
-    vim.api.nvim_create_user_command("MatlabCliRunLine", M.MatlabCliRunLine,{})
-    vim.api.nvim_create_user_command("MatlabCliRunSelection", M.MatlabCliRunSelection,{})
-    vim.api.nvim_create_user_command("MatlabCliRunCell", M.MatlabCliRunCell,{})
-    vim.api.nvim_create_user_command("MatlabOpenWorkspace", M.MatlabOpenWorkspace,{})
-    vim.api.nvim_create_user_command("MatlabOpenEditor", M.MatlabOpenEditor,{})
-    vim.api.nvim_create_user_command("MatlabCliClear", M.MatlabCliClear,{})
+    vim.api.nvim_create_user_command("MatlabCliOpen", M.MatlabCliOpen, {})
+    vim.api.nvim_create_user_command("MatlabCliRunLine", M.MatlabCliRunLine, {})
+    vim.api.nvim_create_user_command("MatlabCliRunSelection", M.MatlabCliRunSelection, {})
+    vim.api.nvim_create_user_command("MatlabCliRunCell", M.MatlabCliRunCell, {})
+    vim.api.nvim_create_user_command("MatlabOpenWorkspace", M.MatlabOpenWorkspace, {})
+    vim.api.nvim_create_user_command("MatlabOpenEditor", M.MatlabOpenEditor, {})
+    vim.api.nvim_create_user_command("MatlabCliClear", M.MatlabCliClear, {})
 
     return _config
 end
@@ -129,7 +129,12 @@ M.MatlabOpenWorkspace = function()
 end
 
 M.MatlabOpenEditor = function()
-    M.MatlabCliRunCommand("edit;\n")
+    -- Get the current buffer number
+    local current_buffer = vim.fn.bufnr('%')
+    local buffer_location = vim.api.nvim_buf_get_name(current_buffer)
+
+
+    M.MatlabCliRunCommand("edit('" .. buffer_location .. "');\n")
 end
 
 M.MatlabCliClear = function()
