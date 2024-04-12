@@ -1,5 +1,7 @@
 # matlab.nvim
 
+ [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 **Simple Lua plugin made to help run Matlab code from Neovim.**
 
 *Do you find yourself forced to use Matlab by forces that be?*
@@ -40,16 +42,15 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim)
 The following are the keybindings I like using:
 
 ```lua
-        -- Keymaps
-        vim.api.nvim_set_keymap('n', '<leader>mo', ':MatlabCliOpen<CR>', {})
-        vim.api.nvim_set_keymap('n', '<leader>mc', ':MatlabCliCancelOperation<CR>', {})
-        vim.api.nvim_set_keymap('n', '<leader>mh', ':MatlabHelp<CR>', {})
-        vim.api.nvim_set_keymap('n', '<leader>md', ':MatlabDoc<CR>', {})
-        vim.api.nvim_set_keymap('n', '<leader>me', ':MatlabOpenEditor<CR>', {})
-        vim.api.nvim_set_keymap('v', '<leader>mr', ':<C-u>execute "MatlabCliRunSelection"<CR>', {})
-        vim.api.nvim_set_keymap('n', '<leader>mw', ':MatlabOpenWorkspace<CR>', {})
-        vim.api.nvim_set_keymap('n', '<leader><CR>', ':MatlabCliRunCell<CR>', {})
-
+-- Keymaps
+vim.api.nvim_set_keymap('n', '<leader>mo', ':MatlabCliOpen<CR>', {})
+vim.api.nvim_set_keymap('n', '<leader>mc', ':MatlabCliCancelOperation<CR>', {})
+vim.api.nvim_set_keymap('n', '<leader>mh', ':MatlabHelp<CR>', {})
+vim.api.nvim_set_keymap('n', '<leader>md', ':MatlabDoc<CR>', {})
+vim.api.nvim_set_keymap('n', '<leader>me', ':MatlabOpenEditor<CR>', {})
+vim.api.nvim_set_keymap('v', '<leader>mr', ':<C-u>execute "MatlabCliRunSelection"<CR>', {})
+vim.api.nvim_set_keymap('n', '<leader>mw', ':MatlabOpenWorkspace<CR>', {})
+vim.api.nvim_set_keymap('n', '<leader><CR>', ':MatlabCliRunCell<CR>', {})
 ```
 ---
 
@@ -65,7 +66,14 @@ First, run the command `:MatlabCliOpen` to open a new Neovim terminal buffer wit
 * `:MatlabOpenWorkspace` - opens GUI workspace on a separate window.
 * `:MatlabOpenEditor` - opens current buffer on Matlab's GUI editor, for those times you can't escape it.
 
+---
 
+## TODO
+
+* Add toggling functionality to the terminal buffer.
+* Improve support for functions.
+
+---
 ## Related Projects
 
 - [nvim-matlab](https://github.com/Rahlir/nvim-matlab)
