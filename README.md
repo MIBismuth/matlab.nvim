@@ -8,6 +8,9 @@
 
 *Fear not, [matlab.nvim](https://github.com/MIBismuth/matlab.nvim) was made for you!*
 
+![Preview](media/cute_intro_demo.png)
+
+
 This plugin allows for Matlab integration straight into Neovim! It achieves that by opening an instance of MatlabCLI on a Neovim terminal buffer and piping
 commands to it. Several user commands are provided to take advantage of basic
 functionalities.
