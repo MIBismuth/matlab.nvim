@@ -9,9 +9,7 @@ M.setup = function(user_opts)
     -- Merge user configuration with defaults
     _config = vim.tbl_deep_extend("keep", user_opts or {}, _defaults)
 
-
-    -- Create User Commands
-
+    -- Create User commands
     vim.api.nvim_create_user_command("MatlabCliOpen", M.matlab_cli_open, {})
     vim.api.nvim_create_user_command("MatlabCliRunLine", M.matlab_cli_run_line, {})
     vim.api.nvim_create_user_command("MatlabCliRunSelection", M.matlab_cli_run_selection, {})
@@ -20,9 +18,10 @@ M.setup = function(user_opts)
     vim.api.nvim_create_user_command("MatlabOpenEditor", M.matlab_open_editor, {})
     vim.api.nvim_create_user_command("MatlabCliClear", M.matlab_cli_clear, {})
     vim.api.nvim_create_user_command("MatlabCliCancelOperation", M.matlab_cli_cancel_operation, {})
-    vim.api.nvim_create_user_command("MatlabCliToggle", M.matlab_cli_toggle, {})
     vim.api.nvim_create_user_command("MatlabHelp", M.matlab_help, {})
     vim.api.nvim_create_user_command("MatlabDoc", M.matlab_doc, {})
+    vim.api.nvim_create_user_command("MatlabCliAddPath", M.matlab_cli_add_path, {})
+    -- vim.api.nvim_create_user_command("MatlabCliToggle", M.matlab_cli_toggle, {})
 
     return _config
 end
@@ -84,10 +83,23 @@ M.matlab_cli_run_selection = function()
     -- or use api.nvim_buf_get_lines
     local lines = vim.api.nvim_buf_get_lines(0, line_start - 1, line_end, false)
 
+    local filtered_lines = {}
+
+    -- Filter out lines starting with % (comments) and blank lines
     for _, line in ipairs(lines) do
-        M.matlab_cli_run_command(line .. "\n")
+        -- Check if the line is not blank and doesn't start with %
+        if line:match("%S") and not line:match("^%s*%%") then
+            table.insert(filtered_lines, line)
+        end
     end
-    return lines
+
+    -- Concatenate all filtered lines into a single string
+    local command = table.concat(filtered_lines, "\n") .. "\n"
+
+    -- Send the concatenated command
+    M.matlab_cli_run_command(command)
+
+    return filtered_lines
 end
 
 
@@ -124,11 +136,23 @@ M.matlab_cli_run_cell = function()
     end
     local lines = vim.api.nvim_buf_get_lines(0, above_line - 1, bellow_line, false)
 
+    local filtered_lines = {}
+
+    -- Filter out lines starting with % (comments) and blank lines
     for _, line in ipairs(lines) do
-        M.matlab_cli_run_command(line .. "\n")
+        -- Check if the line is not blank and doesn't start with %
+        if line:match("%S") and not line:match("^%s*%%") then
+            table.insert(filtered_lines, line)
+        end
     end
 
-    return lines
+    -- Concatenate all filtered lines into a single string
+    local command = table.concat(filtered_lines, "\n") .. "\n"
+
+    -- Send the concatenated command
+    M.matlab_cli_run_command(command)
+
+    return filtered_lines
 end
 
 M.matlab_open_workspace = function()
@@ -168,8 +192,21 @@ M.matlab_doc = function()
     M.matlab_cli_run_command("doc " .. cursorword .. "\n")
 end
 
+M.matlab_cli_add_path = function ()
+    -- Get the current buffer number
+    local current_buffer = vim.fn.bufnr('%')
+    local buffer_location = vim.api.nvim_buf_get_name(current_buffer)
+
+    -- Extracting just the directory part
+    local directory = string.match(buffer_location, "(.-)[^%/]+$")
+
+    M.matlab_cli_run_command((string.format("addpath('%s');\n", directory)))
+
+end
+
 M.matlab_cli_toggle = function ()
-    vim.api.nvim_win_hide(M._cli_win_handle)
+    -- vim.api.nvim_win_hide(M._cli_win_handle)
+    -- TODO: implement toggling of the terminal buffer
 end
 
 
