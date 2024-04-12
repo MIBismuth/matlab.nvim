@@ -1,0 +1,10 @@
+*matlab.nvim*   
+
+This is a very simple Lua plugin made to replace Matlab's default editor for Neovim users. It achieves that by opening an instance of MatlabCLI on a Neovim terminal and piping
+commands to it. Several user commands are provided to take advantage of basic
+functionalities.
+
+
+
+
+vim:tw=78:ts=8:ft=help:norl:
