@@ -2,7 +2,7 @@
 
  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Simple Lua plugin made to help run Matlab code from Neovim.**
+**Simple Lua plugin made to run Matlab code from Neovim.**
 
 *Do you find yourself forced to use Matlab by forces that be?*
 
